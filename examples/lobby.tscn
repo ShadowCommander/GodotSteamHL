@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://br0dwd66l30o4"]
 
-[ext_resource type="Script" path="res://addons/GodotSteamHL/examples/lobby.gd" id="1"]
-[ext_resource type="Script" path="res://addons/GodotSteamHL/examples/network_slider.gd" id="2"]
+[ext_resource type="Script" uid="uid://cxg70r4blsta2" path="res://addons/GodotSteamHL/examples/lobby.gd" id="1"]
+[ext_resource type="Script" uid="uid://q4pv18xeckx" path="res://addons/GodotSteamHL/examples/network_slider.gd" id="2"]
 
 [node name="SteamLobby" type="Node2D"]
 script = ExtResource("1")
@@ -110,3 +110,16 @@ offset_left = 199.0
 offset_top = 39.0
 offset_right = 482.0
 offset_bottom = 159.0
+
+[node name="LobbyListItemList" type="ItemList" parent="."]
+offset_left = 58.0
+offset_top = 180.0
+offset_right = 482.0
+offset_bottom = 311.0
+
+[node name="RefreshLobbyListButton" type="Button" parent="."]
+offset_left = 59.0
+offset_top = 316.0
+offset_right = 187.0
+offset_bottom = 347.0
+text = "Refresh servers"
