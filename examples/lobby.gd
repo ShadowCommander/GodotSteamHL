@@ -110,6 +110,9 @@ func _client_button_pressed(sender_id: int, message, number):
 # Basic lobby connections/setup
 
 func on_change_owner_pressed():
+	var selected_items = member_list.get_selected_items()
+	if selected_items.size() == 0:
+		return
 	var user_index = member_list.get_selected_items()[0]
 	var user = SteamLobby.get_lobby_members().keys()[user_index]
 	var me = Steam.getSteamID()
