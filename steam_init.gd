@@ -16,11 +16,11 @@ func _ready():
 	if not is_steam_enabled():
 		return
 	
-	var init = Steam.steamInit()
-	print("Did Steam initialize?: "+str(init))
+	var initialize_response: Dictionary = Steam.steamInitEx()
+	print("Did Steam initialize?: %s" % initialize_response)
 
-	if init['status'] != 1:
-		print("Failed to initialize Steam. "+str(init['verbal'])+" Shutting down...")
+	if initialize_response['status'] > Steam.STEAM_API_INIT_RESULT_OK:
+		print("Failed to initialize Steam, shutting down: %s" % initialize_response['verbal'])
 		get_tree().quit()
 	
 	steam_id = Steam.getSteamID()
