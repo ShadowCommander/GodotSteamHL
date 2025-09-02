@@ -20,6 +20,10 @@ extends Node
 @onready var chat_send_btn = $ConnectedGUI/ChatSendBtn
 @onready var chat_window = $ConnectedGUI/ChatWindow
 
+@onready var lobby_list_item_list: ItemList = $LobbyListItemList
+@onready var refresh_lobby_list_button: Button = $RefreshLobbyListButton
+
+
 var invite_intent = false
 
 func _ready():
@@ -42,7 +46,11 @@ func _ready():
 	
 	SteamNetwork.peer_status_updated.connect(on_peer_status_changed)
 	SteamNetwork.all_peers_connected.connect(on_all_peers_connected)
-	
+
+	SteamLobbyList.lobby_match_list_returned.connect(on_lobby_match_list_returned)
+	lobby_list_item_list.item_selected.connect(on_lobby_list_item_selected)
+	refresh_lobby_list_button.pressed.connect(on_refresh_lobby_list_pressed)
+
 	create_lobby_btn.pressed.connect(on_create_lobby_pressed)
 	invite_friend_btn.pressed.connect(on_invite_friend_pressed)
 	
@@ -156,3 +164,44 @@ func render_lobby_members():
 		var connected_str = "Connecting ..." if not SteamNetwork.is_peer_connected(member_id) else "Connected"
 		var display_str = "%s%s (%s)" % [owner_str, member, connected_str]
 		member_list.add_item(display_str)
+
+
+var lobby_list_data: Array[LobbyData] = []
+
+class LobbyData:
+	var id: int
+	var name: String
+	var player_count: int
+
+	func _init(_id: int, _name: String, _player_count: int) -> void:
+		id = _id
+		name = _name
+		player_count = _player_count
+
+func on_lobby_match_list_returned(lobbies: Array) -> void:
+	clear_lobby_list()
+	for lobby: int in lobbies:
+		# Pull lobby data from Steam, these are specific to our example
+		var lobby_name: String = Steam.getLobbyData(lobby, "name")
+		# var lobby_mode: String = Steam.getLobbyData(lobby, "mode")
+
+		# Get the current number of members
+		var lobby_num_members: int = Steam.getNumLobbyMembers(lobby)
+
+		var lobby_data = LobbyData.new(lobby, lobby_name, lobby_num_members)
+		lobby_list_data.append(lobby_data)
+		lobby_list_item_list.add_item("%s | Players: %s" % [lobby_name, lobby_num_members])
+
+func on_lobby_list_item_selected(index: int) -> void:
+	var item: LobbyData = lobby_list_data.get(index)
+	if item == null:
+		return
+
+	SteamLobby.join_lobby(item.id)
+
+func clear_lobby_list() -> void:
+	lobby_list_item_list.clear()
+	lobby_list_data.clear()
+
+func on_refresh_lobby_list_pressed() -> void:
+	SteamLobbyList.request_open_lobby_list()
